@@ -3,17 +3,20 @@
 [1. What is `Kubernetes`](#1-what-is-kubernetes)</br>
 [2. Installation](#2-installation)</br>
 [3. Start your local k8s minikube cluster](#3-start-your-local-k8s-minikube-cluster)</br>
-[4. Basic `kubectl` commands](#4-basic-kubectl-commands)</br>
-[4.1 Concept about the layer abstraction](#41-concept-about-the-layer-abstraction)</br>
-[4.2 Deployment CRUD](#42-deployment-crud)</br>
-[4.2.1 Create deployment](#421-create-deployment)</br>
-[4.2.2 List deployment/replicaset/pod info](#422-list-deploymentreplicasetpod-info)</br>
-[4.2.3 List extra info for deployment/replicaset/pod](#423-list-extra-info-for-deploymentreplicasetpod)</br>
-[4.2.4 Edit deployment](#424-edit-deployment)</br>
-[4.2.5 Delete deployment](#425-delete-deployment)</br>
-[4.3 Logging](#43-logging)</br>
-[4.4 Debugging pods](#44-debugging-pods)</br>
-[5. Manage deployment and service by configuration file](https://github.com/wisonye/kubernetes-tutorial#5-manage-deployment-and-service-by-configuration-file)</br>
+[4. Concepts and components](#concepts-and-components)</br>
+
+[5. Basic `kubectl` commands](#5-basic-kubectl-commands)</br>
+[5.1 Concept about the layer abstraction](#51-concept-about-the-layer-abstraction)</br>
+[5.2 Deployment CRUD](#52-deployment-crud)</br>
+[5.2.1 Create deployment](#521-create-deployment)</br>
+[5.2.2 List deployment/replicaset/pod info](#522-list-deploymentreplicasetpod-info)</br>
+[5.2.3 List extra info for deployment/replicaset/pod](#523-list-extra-info-for-deploymentreplicasetpod)</br>
+[5.2.4 Edit deployment](#524-edit-deployment)</br>
+[5.2.5 Delete deployment](#525-delete-deployment)</br>
+[5.3 Logging](#53-logging)</br>
+[5.4 Debugging pods](#54-debugging-pods)</br>
+
+[6. Manage deployment and service by configuration file](https://github.com/wisonye/kubernetes-tutorial#5-manage-deployment-and-service-by-configuration-file)</br>
 
 ## 1. What is `Kubernetes`
 It's a container orchestration tool developed by Google. It helps you to manage your containerized
@@ -111,21 +114,82 @@ minikube start
 
 </br>
 
+## 4. Concepts and components
 
-## 4. Basic `kubectl` commands
+![nodes-1](./readme-images/nodes-1.png)
 
-#### 4.1 Concept about the layer abstraction
+![nodes-2](./readme-images/nodes-2.png)
+
+- Node: The physical or virtual machine for running kubernetes cluster.
+    - Master Node: Manage all the worker node to run all pods, 4 processes below must
+    in every master node:
+        - API server: The k8s cluster gateway to let the outside world interact with the cluster.
+        - Scheduler: Decide run pod on the particular worker node based on the resource usage (CPU, MEM, et).
+        - Control manager: Detect cluster state change and recover by talking with the Scheduler.
+        - etcd: Key-value store for the cluster state.
+
+    </br>
+
+    - Worker Node: The real node to run pods (container instances), 3 processes below must
+    in every worker node:
+        - kubelet: It interacts with both nodes and containers and starts the container.
+        - Kube proxy: Forward the request from service to pod.
+        - Container runtime: To run the actual container instance.
+
+</br>
+
+![concepts-and-component](./readme-images/concepts-and-components.png)
+
+- Pod:
+    - Smallest unit in k8s
+    - Abstraction of container
+    - Usually 1 application container per pod
+    - Each pod has a new IP address when created
+
+    </br>
+
+- Service:
+    - Service has permanent IP address which the pod doesn't
+    - Service has load-balancing feature to forward the request to the particular pod cross
+    different worker node
+    - Service type:
+        - Internal Service: Can't be accessed from the outside world, like Database service
+        - External Service: Can be accessed from the outside world, like application service
+
+    </br>
+
+- Ingress: Work like a load-balancer to forward request to the particular service
+
+- ConfigMap: Just like a bunch of environment vars that can be applied to the pod application
+like IP and port or any application settings.
+
+- Secret: The same thing as `ConfigMap` but be encrypted, good for password, database URI or any
+credential setting for the application.
+
+- Volumes: The persistent data storage that be mounted into the service or pod.
+
+
+</br>
+
+## 5. Basic `kubectl` commands
+
+#### 5.1 Concept about the layer abstraction
 
     `Deployment` -- manages --> `Replica set` -- manages --> `Pod` -- abstraction of --> `Container (instance)`
     
     That's why you only need to deal with the `Deployment` as an administrator, no need to interact with the `replicaset and `pod`.
 
+    One thing need to know about is the `StatefulSet` which different with the `Replicaset`. For database,
+    it can't be replicated, as all copies should use the same storage. That's why for the database application,
+    you should use the `StatefulSet` instead of the `Replicaset`. But in practice, the best choice is by using
+    the original database cluster service rather than config by yourself in your k8s cluster.
+
 </br>
 
 
-#### 4.2 Deployment CRUD
+#### 5.2 Deployment CRUD
 
-##### 4.2.1 Create deployment
+##### 5.2.1 Create deployment
 
 ```bash
 kubectl create deployment test-web-server-depl --image=nginx --replicas=3 --port=8088
@@ -134,7 +198,7 @@ kubectl create deployment test-web-server-depl --image=nginx --replicas=3 --port
 
 </br>
 
-##### 4.2.2 List deployment/replicaset/pod info
+##### 5.2.2 List deployment/replicaset/pod info
 
 ```bash
 kubectl get deployment --output=wide
@@ -167,7 +231,7 @@ If you don't specified the `name`, then random id will be generated like below:
 
 </br>
 
-##### 4.2.3 List extra info for deployment/replicaset/pod
+##### 5.2.3 List extra info for deployment/replicaset/pod
 
 Sometimes, it's very useful to know the deployment scales history, then you use `kubectl describe deployement`:
 
@@ -276,7 +340,7 @@ kubectl describe pods
 
 </br>
 
-##### 4.2.4 Edit deployment
+##### 5.2.4 Edit deployment
 
 ```bash
 kubectl edit deployment test-web-server-depl
@@ -289,7 +353,7 @@ After that, it opens the live configuration file inside your default editor. The
 </br>
 
 
-##### 4.2.5 Delete deployment
+##### 5.2.5 Delete deployment
 
 ```bash
 kubectl delete deployment test-web-server-depl
@@ -297,7 +361,7 @@ kubectl delete deployment test-web-server-depl
 
 </br>
 
-## 4.3 Logging
+## 5.3 Logging
 
 - View only one container logging with the exactly pod name:
 
@@ -316,7 +380,7 @@ kubectl delete deployment test-web-server-depl
 
     </br>
 
-## 4.4 Debugging pods
+## 5.4 Debugging pods
 
 You can login into the particular pod container instance to have a look by running:
 
@@ -329,7 +393,7 @@ kubectl exec -it test-web-server-depl-6dfb46c84f-6l5hj -- bin/bash
 </br>
 
 
-## 5. Manage deployment and service by configuration file
+## 6. Manage deployment and service by configuration file
 
 You can use `kubectl apply --filename [configuration file name]` to create or edit deployment and service.
 
