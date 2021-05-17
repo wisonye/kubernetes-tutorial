@@ -1,6 +1,19 @@
 # `Kubernetes` Tutorial
 
-[1. What is `Kubernetes`](#1-what-is-abi-and-ffi)</br>
+[1. What is `Kubernetes`](#1-what-is-kubernetes)</br>
+[2. Installation](#2-installatio)</br>
+[3. Start your local k8s minikube cluster](#3-start-your-local-k8s-minikube-cluster)</br>
+[4. Basic `kubectl` commands](#4-basic-kubectl-commands)</br>
+[4.1 Concept about the layer abstraction](#41-concept-about-the-layer-abstraction)</br>
+[4.2 Deployment CRUD](#42-deployment-crud)</br>
+[4.2.1 Create deployment](#421-create-deployment)</br>
+[4.2.2 List deployment/replicaset/pod info](#422-list-deploymentreplicasetpod-info)</br>
+[4.2.3 List extra info for deployment/replicaset/pod](#423-list-extra-info-for-deploymentreplicasetpod)</br>
+[4.2.4 Edit deployment](#424-edit-deployment)</br>
+[4.2.5 Delete deployment](#425-delete-deployment)</br>
+[4.3 Logging](#43-logging)</br>
+[4.4 Debugging pods](#44-debugging-pods)</br>
+[5. Manage deployment and service by configuration file](https://github.com/wisonye/kubernetes-tutorial#5-manage-deployment-and-service-by-configuration-file)</br>
 
 ## 1. What is `Kubernetes`
 It's a container orchestration tool developed by Google. It helps you to manage your containerized
@@ -18,7 +31,7 @@ The abbreviation `K8s` is derived by replacing the eight letters of â€œuberneteâ
 
 `minikube` is local Kubernetes, focusing on making it easy to learn and develop for Kubernetes.
 Basically, `minikube` is a kubernetes cluster run in your local machine (single node case). It
-includes the 4 `master` processes and 3 `worker processes in your single-node cluster environment.
+includes the 4 `master` processes and 3 `worker` processes in your single-node cluster environment.
 
 ```bash
 # HyperKit is an open-source hypervisor for macOS hypervisor, optimized for lightweight
