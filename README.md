@@ -3,7 +3,7 @@
 [1. What is `Kubernetes`](#1-what-is-kubernetes)</br>
 [2. Installation](#2-installation)</br>
 [3. Start your local k8s minikube cluster](#3-start-your-local-k8s-minikube-cluster)</br>
-[4. Concepts and components](#concepts-and-components)</br>
+[4. Concepts and components](#4-concepts-and-components)</br>
 
 [5. Basic `kubectl` commands](#5-basic-kubectl-commands)</br>
 [5.1 Concept about the layer abstraction](#51-concept-about-the-layer-abstraction)</br>
@@ -16,7 +16,7 @@
 [5.3 Logging](#53-logging)</br>
 [5.4 Debugging pods](#54-debugging-pods)</br>
 
-[6. Manage deployment and service by configuration file](https://github.com/wisonye/kubernetes-tutorial#5-manage-deployment-and-service-by-configuration-file)</br>
+[6. Manage deployment and service by configuration file](#6-manage-deployment-and-service-by-configuration-file)</br>
 
 ## 1. What is `Kubernetes`
 It's a container orchestration tool developed by Google. It helps you to manage your containerized
