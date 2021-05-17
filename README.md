@@ -1,7 +1,7 @@
 # `Kubernetes` Tutorial
 
 [1. What is `Kubernetes`](#1-what-is-kubernetes)</br>
-[2. Installation](#2-installatio)</br>
+[2. Installation](#2-installation)</br>
 [3. Start your local k8s minikube cluster](#3-start-your-local-k8s-minikube-cluster)</br>
 [4. Basic `kubectl` commands](#4-basic-kubectl-commands)</br>
 [4.1 Concept about the layer abstraction](#41-concept-about-the-layer-abstraction)</br>
