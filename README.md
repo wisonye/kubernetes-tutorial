@@ -17,8 +17,8 @@
 [5.4 Debugging pods](#54-debugging-pods)</br>
 
 [6. Manage deployment and service by configuration file](#6-manage-deployment-and-service-by-configuration-file)</br>
-[6.1 Let's try to deploy the nginx case via configuration file]()</br>
-[6.2 Comparisons between `Docker Swarm` and `Kubernetes` for deploying cluster]()</br>
+[6.1 Let's try to deploy the nginx case via configuration file](#61-lets-try-to-deploy-the-nginx-case-via-configuration-file)</br>
+[6.2 Comparisons between `Docker Swarm` and `Kubernetes` for deploying cluster](#62-comparisons-between-docker-swarm-and-kubernetes-for-deploying-cluster)</br>
 
 ## 1. What is `Kubernetes`
 It's a container orchestration tool developed by Google. It helps you to manage your containerized
