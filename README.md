@@ -17,6 +17,8 @@
 [5.4 Debugging pods](#54-debugging-pods)</br>
 
 [6. Manage deployment and service by configuration file](#6-manage-deployment-and-service-by-configuration-file)</br>
+[6.1 Let's try to deploy the nginx case via configuration file]()</br>
+[6.2 Comparisons between `Docker Swarm` and `Kubernetes` for deploying cluster]()</br>
 
 ## 1. What is `Kubernetes`
 It's a container orchestration tool developed by Google. It helps you to manage your containerized
@@ -361,7 +363,7 @@ kubectl delete deployment test-web-server-depl
 
 </br>
 
-## 5.3 Logging
+#### 5.3 Logging
 
 - View only one container logging with the exactly pod name:
 
@@ -380,7 +382,7 @@ kubectl delete deployment test-web-server-depl
 
     </br>
 
-## 5.4 Debugging pods
+#### 5.4 Debugging pods
 
 You can login into the particular pod container instance to have a look by running:
 
@@ -395,49 +397,142 @@ kubectl exec -it test-web-server-depl-6dfb46c84f-6l5hj -- bin/bash
 
 ## 6. Manage deployment and service by configuration file
 
-You can use `kubectl apply --filename [configuration file name]` to create or edit deployment and service.
+Here is the convenience way to manage the cluster:
+
+| Command | Purpose
+|--------------|---------------
+|`kubectl apply --filename [configuration file name]` | create, edit deployment and service
+|`kubectl delete --filename [configuration file name]` | destroy deployment and service
 
 `kubernetes` make sure the actual state will be the same as the desired state eventually. If some pods are
 terminated, then new pods will be created which work like a self-healing.
 
-Below is the sample configuration file:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-    name: test-web-server-depl
-    labels:
-        app: nginx-server
-
-# Specification for the deployment
-spec:
-    replicas: 5
-    selector:
-        matchLabels:
-            app: nginx-server
-    template:
-        metadata:
-            labels:
-                app: nginx-server
-
-        # Specification for the pod
-        spec:
-            containers:
-            - image: nginx
-              imagePullPolicy: Always
-              name: nginx
-              ports:
-              - containerPort: 8088
-                protocol: TCP
-            restartPolicy: Always
-            terminationGracePeriodSeconds: 5
-```
-
 </br>
 
-After you created or updated the configuration file, you can use `kubectl delete --filename [configuration file name]`
-to remove the deployment or service.
+#### 6.1 Let's try to deploy the nginx case via configuration file
+
+- Below is the sample configuration file in `~/temp/temp-config.yaml`:
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+        name: test-web-server-depl
+        labels:
+            app: nginx-server
+    
+    # Specification for the deployment
+    spec:
+        replicas: 5
+        selector:
+            # `labels` uses to be connected between deployment and pod
+            matchLabels:
+                app: nginx-server
+    
+        # `template` just an embedded config for the pod, it has its
+        # own `metadata` and `spec` but only focusing on the pod.
+        template:
+            metadata:
+                labels:
+                    app: nginx-server
+    
+            # Specification for the pod
+            spec:
+                containers:
+                - image: nginx
+                  imagePullPolicy: Always
+                  name: nginx
+                  ports:
+                  - containerPort: 80
+                    protocol: TCP
+                restartPolicy: Always
+                terminationGracePeriodSeconds: 5
+    
+    # The separator line for multiple configration contents in the same YAML file
+    ---
+    
+    # The external service to expose the port to outside world for accessing the pod's
+    # open port.
+    apiVersion: v1
+    kind: Service
+    metadata:
+        name: test-web-service
+    spec:
+        # Service is `internal` by default which means only can be accessed inside the 
+        # kubernetes cluster component. `type: LoadBalancer` means that's an `external`
+        # service that can be accessed from the outside world.
+        #
+        # Btw, even the service is an `internal` service, it still works as a load
+        # balancer. So the name of `LoadBalancer` is quite confuse sometimes:)
+        type: LoadBalancer
+    
+        # Service use this `selector` to connect to the pod through the `label` in the
+        # pod's `template --> metadata --> labels`. The case here means this service
+        # should connect the pod which has the label value with `app=nginx-server`
+        selector:
+            app: nginx-server
+        ports:
+            # Mapping service port 8088 to the pod's open port 80 on TCP
+            - protocol: TCP
+              port: 8088
+              targetPort: 80
+              # Optional field
+              # By default and for convenience, the Kubernetes control plane will 
+              # allocate a port from a range (default: 30000-32767)
+              nodePort: 30008
+    ```
+
+    </br>
+
+- Create the deployment and service
+
+    ```bash
+    kubectl apply --filename ~/temp/temp-config.yaml
+    
+    # deployment.apps/test-web-server-depl created
+    # service/test-web-service created
+
+
+    kubectl get all --output=wide
+    ```
+
+    ![create-via-config-file.png](./readme-images/create-via-config-file.png)
+
+    What the configration file above is asking for:
+
+    - Create a deployment with 5 replicas for nginx pod, each nginx pod open port on `80`.
+    - Create a external service for exposing the pod's open port, like a forward mapping between service and pod on `8088 -> 80`
+    - `nodePort` means the listening port on the external IP 
+    - Echo service has the `Cluster-IP` which is the `internal IP`, only the `external service`
+    has the `EXTERNAL-IP`.
+
+    </br>
+
+    If you run `minikube service list` then you should be able to see the list like below:
+
+    ![minikube-servie-list.png](./readme-images/minikube-servie-list.png)
+
+    Then you can access the nginx service via `http://192.168.64.2:30008` in your browser.
+
+    You can edit your configration file anytime and re-run the command again, kubernetes will
+    updated the actual state to the desired state automatic.
+
+    </br>
+
+
+- Destroy the deployment and service
+
+    ```bash
+    kubectl delete --filename ~/temp/temp-config.yaml
+
+    # deployment.apps "test-web-server-depl" deleted
+    # service "test-web-service" deleted
+    ```
+
+    </br>
+
+
+#### 6.2 Comparisons between `Docker Swarm` and `Kubernetes` for deploying cluster
 
 If you compare to the `Docker Swarm`, here is the command comparison list:
 
@@ -447,5 +542,4 @@ If you compare to the `Docker Swarm`, here is the command comparison list:
 |# Stop cluster </br>docker stack rm [stack name] | # Stop cluster </br> kubectl delete --filename [filename]
 
 </br>
-
 
