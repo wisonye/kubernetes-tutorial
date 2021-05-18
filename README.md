@@ -517,6 +517,10 @@ terminated, then new pods will be created which work like a self-healing.
     You can edit your configration file anytime and re-run the command again, kubernetes will
     updated the actual state to the desired state automatic.
 
+    The actual HTTP request network route should look like below:
+
+    `Browser request -> external service IP:port (192.168.64.2:30008) -> servcie to pod mapping (30008 -> 8088 -> 80) -> ngix container port (80)`
+
     </br>
 
 
