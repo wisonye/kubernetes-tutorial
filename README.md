@@ -194,7 +194,7 @@ credential setting for the application.
 ##### 5.2.1 Create deployment
 
 ```bash
-kubectl create deployment test-web-server-depl --image=nginx --replicas=3 --port=8088
+kubectl create deployment test-web-server-depl --image=nginx --replicas=3 --port=80
 # deployment.apps/test-web-server-depl created
 ```
 
@@ -255,7 +255,7 @@ kubectl describe deployment test-web-server-depl
 #   Containers:
 #    nginx:
 #     Image:        nginx
-#     Port:         8088/TCP
+#     Port:         80/TCP
 #     Host Port:    0/TCP
 #     Environment:  <none>
 #     Mounts:       <none>
@@ -298,7 +298,7 @@ kubectl describe pod test-web-server-depl-79d6c8b8b4-5tnhv
 #     Container ID:   docker://c6d39c2319a2a4f945898124bc70b2aa2d850ca52dcb4c82a2e952e57674587f
 #     Image:          nginx
 #     Image ID:       docker-pullable://nginx@sha256:df13abe416e37eb3db4722840dd479b00ba193ac6606e7902331dcea50f4f1f2
-#     Port:           8088/TCP
+#     Port:           80/TCP
 #     Host Port:      0/TCP
 #     State:          Running
 #       Started:      Mon, 17 May 2021 17:09:18 +1200
