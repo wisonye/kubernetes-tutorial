@@ -547,3 +547,86 @@ If you compare to the `Docker Swarm`, here is the command comparison list:
 
 </br>
 
+## 7. Namespace in Kubernetes
+
+#### 7.1 What is namespace
+
+
+Kubernetes use `namespace` to organize the resources, you can think of `namespace` likes
+a virtual cluster inside the Kubernetes cluster. 
+
+</br>
+
+#### 7.2 The default namespace
+
+```bash
+# Show the default namespace created by default
+kubectl get namespace
+
+# NAME              STATUS   AGE
+# default           Active   30h
+# kube-node-lease   Active   30h
+# kube-public       Active   30h
+# kube-system       Active   30h
+```
+
+![default-namespace](./readme-images/default-namespace.png)
+
+- `kube-system`: Use to run the system processes, master and kubectl processes.
+- `kube-public`: Use to hold public access data, `configMap` and cluster info when running `kubectl cluster-info`.
+- `kube-node-lease`: Use to hold the heartbeats of nodes.
+- `default`: Use to run all components you created without specified namespace.
+
+</br>
+
+#### 7.3 Create new namespace
+
+```bash
+kubectl create namespace my-backend-ns
+```
+
+</br>
+
+#### 7.4 Why use namespace
+
+Here is the benefit for using namespace:
+
+- Avoiding the deployment and service name conflict
+
+    For example, if you have a different dev team to develop a different product
+    or a different dev team for building the particular functionality for the same product.
+
+    If they don't communicate well and use the same deployment name, so that will override
+    the previous deployment by the name conflict.
+    
+    For that case, you should use different namespace to avoid that.
+
+- Staging deployment
+
+    For example, you can have `Development` cluster and `Production` cluster
+    by using different namespace in the same kubernetes cluster. So both user
+    and developer can use the same Kubernetes cluster without any problem.
+
+    Also, you can separate the core service into another namespace, then both
+    `Development` cluster and `Production` cluster can share the same core.
+
+- Developer permission control and working environment isolation
+
+    You can deploy different cluster into different namespace, and assign
+    different permission to different dev team member. So they can only access
+    to the cluster they're working on. 
+
+- A/B testing
+
+    You can have A/B testing on different namespace.
+
+- Cluster resource limitation
+
+    For example, you can assign the lower CPU/Memory/Storage resources to
+    the non-important cluster.
+
+</br>
+
+
+
+
